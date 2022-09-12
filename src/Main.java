@@ -41,10 +41,10 @@ public class Main {
     };
 
     static String[] create_menu = {
-            "1) Водопроводчик",
-            "2) Электрик",
-            "3) Уборщик",
-            "4) Вывоз мусора"
+            "Водопроводчик",
+            "Электрик",
+            "Уборщик",
+            "Вывоз мусора"
     };
 
     public static void main(String[] args) {
@@ -109,22 +109,43 @@ public class Main {
     }
 
     private static void viewServices(ArrayList<ArrayList<Service>> all_services) {
+        final int[] counter = {0, 1};
         System.out.println("Список всех услуг:");
-        for (int i = 0; i < all_services.size(); i++) {
-            System.out.println(create_menu[i]);
-            for (int j = 0; j < all_services.get(i).size(); j++) {
+        /*for (int i = 0; i < all_services.size(); i++) {
+            System.out.println((i + 1) + ") " + create_menu[i]);
+            /*for (int j = 0; j < all_services.get(i).size(); j++) {
                 System.out.println(" " + (j + 1) + ". " + all_services.get(i).get(j).getDescription()
                         + " -> " + all_services.get(i).get(j).getPrice() + " руб.");
-            }
-        }
+            }//
+            all_services.get(i).forEach(service -> {
+                System.out.println(" " + (counter[0]++) + ". " + service.getDescription()
+                        + " -> " + service.getPrice() + " руб.");
+            });
+            counter[0] = 1;
+        }*/
+        all_services.forEach(services -> {
+            System.out.println((counter[0] + 1) + ") " + create_menu[counter[0]]);
+            services.forEach(service -> {
+                System.out.println(" " + (counter[1]++) + ". " + service.getDescription()
+                        + " -> " + service.getPrice() + " руб.");
+            });
+            counter[0]++;
+            counter[1] = 1;
+        });
     }
 
+    //Settable<Integer> minus_1 = index -> --index;
     private static void viewServices(ArrayList<ArrayList<Service>> all_services, int index) {
+        final int[] counter = {1};
         System.out.println("Список услуг " + create_menu[index] + ":");
-        for (int j = 0; j < all_services.get(index).size(); j++) {
+        /*for (int j = 0; j < all_services.get(index).size(); j++) {
             System.out.println(" " + (j + 1) + ". " + all_services.get(index).get(j).getDescription()
                     + " -> " + all_services.get(index).get(j).getPrice() + " руб.");
-        }
+        }*/
+        all_services.get(index).forEach(service -> {
+            System.out.println(" " + (counter[0]++) + ". " + service.getDescription()
+                    + " -> " + service.getPrice() + " руб.");
+        });
     }
 
     private static void orderService(Scanner scanner, ArrayList<Service> order) {
@@ -144,9 +165,17 @@ public class Main {
 
     private static void viewOrderedServices(ArrayList<Service> order) {
         int total_price = 0;
+        String previous_class = "";
+        //Class Cleaner = null;
+        //Class previous_class = null;
+        order.sort(Comparator.comparing((Service o) -> o.getClass().getName()));
         System.out.println("Заказано: ");
         for (Service ordered_services : order) {
-            System.out.println(ordered_services + "\n" + ordered_services.getDescription()
+            if (!previous_class.equals(ordered_services.getClass().getName())){
+                System.out.println(ordered_services + ":");
+                previous_class = ordered_services.getClass().getName();
+            }
+            System.out.println(" " + ordered_services.getDescription()
                     + " -> " + ordered_services.getPrice());
             total_price += ordered_services.getPrice();
         }
