@@ -264,8 +264,8 @@ public class Main {
         FileOutputStream fileOutputStream = null;
         System.out.println("Запись услуг в файл " + services_file);
         try {
-            File exportTaxpayersFile = new File(services_file);
-            fileOutputStream = new FileOutputStream(exportTaxpayersFile);
+            File exportServicesFile = new File(services_file);
+            fileOutputStream = new FileOutputStream(exportServicesFile);
             ObjectOutputStream outputStream = new ObjectOutputStream(fileOutputStream);
             outputStream.writeObject(serviceBureau.getServiceList());
             int sum = 0;
