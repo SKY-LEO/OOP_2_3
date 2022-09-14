@@ -7,37 +7,15 @@ import java.util.*;
 public class Main {
     private final static String services_file = "services.txt";
 
-    /*Plumber[] plumber_services = new Plumber[]{
-            new Plumber("Установка крана", 40),
-            new Plumber("Подключение полотенцесушителя", 70),
-            new Plumber("Устранение засора", 57)
-    };
-
-    Electrician[] electrician_services = new Electrician[]{
-            new Electrician("Установка розетки", 35),
-            new Electrician("Установка выключателя", 30),
-            new Electrician("Замена лампочки", 10)
-    };
-
-    Cleaner[] cleaner_services = new Cleaner[]{
-            new Cleaner("Уборка квартиры", 120),
-            new Cleaner("Мойка окон", 60)
-    };
-
-    GarbageCollection[] garbage_services = new GarbageCollection[]{
-            new GarbageCollection("Вывоз мусора", 35),
-            new GarbageCollection("Утилизация отходов", 25)
-    };*/
-
     static ServiceBureau serviceBureau;
 
     static String[] main_menu = {
-            "1) Просмотр доступных услуг",
-            "2) Заказ услуг",
-            "3) Просмотр заказанных услуг",
-            "4) Создать новую услугу",
-            "5) Изменить услугу",
-            "0) Выход"
+            "Просмотр доступных услуг",
+            "Заказ услуг",
+            "Просмотр заказанных услуг",
+            "Создать новую услугу",
+            "Изменить услугу",
+            "Выход"
     };
 
     static String[] create_menu = {
@@ -53,24 +31,7 @@ public class Main {
     }
 
     private static void menu() {
-        try {
-            ArrayList<ArrayList<Service>> listOfImportedServices = importServices();
-            for (ArrayList<Service> services : listOfImportedServices) {
-                for (Service service : services) {
-                    System.out.println("Услуга " + service.getDescription()
-                            + " была импортирована.");
-                }
-                serviceBureau.addService(services);
-            }
-        } catch (IOException | ClassNotFoundException e) {
-            System.out.println(e.getMessage());
-            ArrayList<ArrayList<Service>> services = new ArrayList<>();
-            services.add(new ArrayList<>());
-            services.add(new ArrayList<>());
-            services.add(new ArrayList<>());
-            services.add(new ArrayList<>());
-            serviceBureau.setServiceList(services);
-        }
+        fillServiceBureau();
         ArrayList<Service> order = new ArrayList<>();
         Scanner scanner = new Scanner(System.in);
         int number;
@@ -86,7 +47,7 @@ public class Main {
                     case 3 -> viewOrderedServices(order);
                     case 4 -> createService(scanner);
                     case 5 -> editService(scanner, serviceBureau.getServiceList());
-                    case 0 -> {
+                    case 6 -> {
                         flag = false;
                         try {
                             exportServices();
@@ -111,18 +72,6 @@ public class Main {
     private static void viewServices(ArrayList<ArrayList<Service>> all_services) {
         final int[] counter = {0, 1};
         System.out.println("Список всех услуг:");
-        /*for (int i = 0; i < all_services.size(); i++) {
-            System.out.println((i + 1) + ") " + create_menu[i]);
-            /*for (int j = 0; j < all_services.get(i).size(); j++) {
-                System.out.println(" " + (j + 1) + ". " + all_services.get(i).get(j).getDescription()
-                        + " -> " + all_services.get(i).get(j).getPrice() + " руб.");
-            }//
-            all_services.get(i).forEach(service -> {
-                System.out.println(" " + (counter[0]++) + ". " + service.getDescription()
-                        + " -> " + service.getPrice() + " руб.");
-            });
-            counter[0] = 1;
-        }*/
         all_services.forEach(services -> {
             System.out.println((counter[0] + 1) + ") " + create_menu[counter[0]]);
             services.forEach(service -> {
@@ -134,14 +83,9 @@ public class Main {
         });
     }
 
-    //Settable<Integer> minus_1 = index -> --index;
     private static void viewServices(ArrayList<ArrayList<Service>> all_services, int index) {
         final int[] counter = {1};
         System.out.println("Список услуг " + create_menu[index] + ":");
-        /*for (int j = 0; j < all_services.get(index).size(); j++) {
-            System.out.println(" " + (j + 1) + ". " + all_services.get(index).get(j).getDescription()
-                    + " -> " + all_services.get(index).get(j).getPrice() + " руб.");
-        }*/
         all_services.get(index).forEach(service -> {
             System.out.println(" " + (counter[0]++) + ". " + service.getDescription()
                     + " -> " + service.getPrice() + " руб.");
@@ -166,12 +110,10 @@ public class Main {
     private static void viewOrderedServices(ArrayList<Service> order) {
         int total_price = 0;
         String previous_class = "";
-        //Class Cleaner = null;
-        //Class previous_class = null;
-        order.sort(Comparator.comparing((Service o) -> o.getClass().getName()));
+        order.sort(Comparator.comparing((Service object) -> object.getClass().getName()));
         System.out.println("Заказано: ");
         for (Service ordered_services : order) {
-            if (!previous_class.equals(ordered_services.getClass().getName())){
+            if (!previous_class.equals(ordered_services.getClass().getName())) {
                 System.out.println(ordered_services + ":");
                 previous_class = ordered_services.getClass().getName();
             }
@@ -209,7 +151,8 @@ public class Main {
                     GarbageCollection garbageCollection = new GarbageCollection(service_name, price);
                     serviceBureau.getServiceList().get(3).add(garbageCollection);
                 }
-                default -> System.out.println("Введите целое число в промежутке от 0 до " + (create_menu.length - 1));
+                default -> System.out.println("Введите целое число в промежутке от 0 до " +
+                        (create_menu.length - 1));
             }
         } catch (InputMismatchException e) {
             System.out.println("Некорректный ввод. Введите целое число");
@@ -246,11 +189,14 @@ public class Main {
         }
     }
 
+    interface replaceNotLetters {
+        String replace(String str);
+    }
+
     private static String enterServiceName(Scanner scanner) {
-        String service_name;
         System.out.println("Введите название услуги: ");
-        service_name = replaceNotLetters(scanner.nextLine());
-        return service_name;
+        replaceNotLetters replace_string = (first_string) -> first_string.replaceAll("[^А-Яа-я ']", "");
+        return replace_string.replace(scanner.nextLine());
     }
 
     private static int inputNumber(Scanner scanner, String message) {
@@ -267,14 +213,31 @@ public class Main {
         }
     }
 
-    private static String replaceNotLetters(String st) {
-        return st.replaceAll("[^А-Яа-я ']", "");
-    }
-
     private static void printMenuOptions(String[] options) {
         System.out.println("Выберите пункт меню:");
-        for (String option : options) {
-            System.out.println(option);
+        for (int i = 0; i < options.length; i++) {
+            System.out.println((i + 1) + ") " + options[i]);
+        }
+    }
+
+    private static void fillServiceBureau(){
+        try {
+            ArrayList<ArrayList<Service>> listOfImportedServices = importServices();
+            for (ArrayList<Service> services : listOfImportedServices) {
+                for (Service service : services) {
+                    System.out.println("Услуга " + service.getDescription()
+                            + " была импортирована.");
+                }
+                serviceBureau.addService(services);
+            }
+        } catch (IOException | ClassNotFoundException e) {
+            System.out.println(e.getMessage());
+            ArrayList<ArrayList<Service>> services = new ArrayList<>();
+            services.add(new ArrayList<>());
+            services.add(new ArrayList<>());
+            services.add(new ArrayList<>());
+            services.add(new ArrayList<>());
+            serviceBureau.setServiceList(services);
         }
     }
 
